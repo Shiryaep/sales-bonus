@@ -30,35 +30,51 @@ function calculateBonusByProfit(index, total, seller) {
  * @returns {{revenue, top_products, bonus, name, sales_count, profit, seller_id}[]}
  */
 function analyzeSalesData(data, options) {
-  // Здесь проверим входящие данные
+  // @TODO: Проверка входных данных
   CheckAllDataStuff(data);
 
-  if (typeof options === "object") throw new Error("options is not an object");
+  if (typeof options === "Object") throw new Error("options is not an object");
 
-  const { calculateRevenue, calculateBonus } = options; // Сюда передадим функции для расчётов
-
-  if (!calculateRevenue || !calculateBonus)
-    throw new Error("Some options are missing");
-
-  if (
-    typeof calculateRevenue === "function" ||
-    typeof calculateBonus === "function"
-  )
-    throw new Error("Some options are not a functions");
-
-  // Здесь посчитаем промежуточные данные и отсортируем продавцов
-
-  // Вызовем функцию расчёта бонуса для каждого продавца в отсортированном массиве
-
-  // Сформируем и вернём отчёт
-
-  // @TODO: Проверка входных данных
+  const { calculateRevenue, calculateBonus } = options;
 
   // @TODO: Проверка наличия опций
+  if (!calculateRevenue || !calculateBonus)
+  {
+    throw new Error("Some options are missing");
+  }
+
+  if (
+    typeof calculateRevenue !== "function" ||
+    typeof calculateBonus !== "function"
+  )
+  {
+    throw new Error("Some options are not a functions");
+  }
 
   // @TODO: Подготовка промежуточных данных для сбора статистики
+  const sellerStats = data.sellers.map((seller) => ({
+    id: seller.id,
+    name: `${seller.first_name} ${seller.last_name}`,
+    revenue: 0,
+    profit: 0,
+    sales_count: 0,
+    products_sold: {},
+  }));
+
+  // return sellerStats;
 
   // @TODO: Индексация продавцов и товаров для быстрого доступа
+  const sellerIndex = sellerStats.reduce((result, item) => ({
+    ...result,
+    [item.id] : item
+  }), {})
+
+  const productIndex = data.products.reduce((result, item) => ({
+    ...result,
+    [item.sku] : item
+  }), {})
+
+  return productIndex;
 
   // @TODO: Расчет выручки и прибыли для каждого продавца
 
@@ -83,3 +99,9 @@ function CheckAllDataStuff(data) {
   )
     throw new Error("Некорректные входные данные");
 }
+
+// В products_sold будем накапливать количество всех проданных товаров:
+// ключ объекта — артикул товара;
+// значение — количество, которое будет увеличиваться по мере обработки записей о продажах.
+
+// Исходные данные представлены массивами, поэтому удобно преобразовать их в объекты или словари (Map) для быстрого доступа, чтобы постоянно не выполнять поиск.
